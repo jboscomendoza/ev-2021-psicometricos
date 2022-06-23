@@ -58,7 +58,7 @@ resultados_baja <-
     tabla %>% 
       mutate(
         p_baja = ifelse(rc_p < .30, "Baja", ""),
-        rpbis_baja = ifelse(rc_rpbis < .30, "Baja", ""),
+        rpbis_baja = ifelse(rc_rpbis < .20, "Baja", ""),
         dificultad = (delta * 100) + 500
         )
   })
