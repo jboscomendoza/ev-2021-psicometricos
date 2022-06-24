@@ -46,7 +46,6 @@ create_boxplot <- function(tabla, eje_y) {
     geom_boxplot() +
     geom_point(position = position_dodge(.75), alpha =.3) +
     theme_bw()
-}
+}-2.5
 
 create_boxplot(psicom, beta)
-
