@@ -29,3 +29,24 @@ psicom %>%
   geom_line(aes(group = asignatura)) +
   geom_label(aes(label = round(Beta, 3))) +
   theme_bw()
+
+psicom %>% 
+  rename("Beta" = "beta") %>% 
+  ggplot() +
+  aes(asignatura, Beta, color = grado) +
+  geom_boxplot() +
+  geom_point(position = position_dodge(.75), alpha =.3) +
+  theme_bw()
+
+
+create_boxplot <- function(tabla, eje_y) {
+  tabla %>% 
+    ggplot() +
+    aes(asignatura, {{ eje_y }}, color = grado) +
+    geom_boxplot() +
+    geom_point(position = position_dodge(.75), alpha =.3) +
+    theme_bw()
+}
+
+create_boxplot(psicom, beta)
+
