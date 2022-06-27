@@ -72,25 +72,37 @@ write_csv(psicometricos_2pl_df, "psicometricos_2pl.csv" )
 
 
 # Plots
-dir.create("plots_2pl/")
-
-map(psicometricos_2pl_mirt, function(modelo){
+get_plot <- function(salida_mirt, tipo = "trace") {
+  modelo <- salida_mirt$modelo
   
-  prueba <- unique(modelo$parametros$prueba)
-  items  <- modelo$parametros$item
+  prueba <- unique(salida_mirt$parametros$prueba)
+  items  <- salida_mirt$parametros$item
+  
   conteo <- 1:length(items)
   
-  ruta <- paste0("plots_2pl/", prueba, "/")
+  ruta_base <- paste0("plots_2pl_", tipo, "/")
+  ruta <- paste0("plots_2pl_", tipo, "/", prueba, "/")
+  
+  if(!dir.exists(ruta_base)) dir.create(ruta_base)
   if(!dir.exists(ruta)) dir.create(ruta)
   
-  map(conteo, function(reactivo) {
-    reactivo_nom <- str_pad(reactivo, width = 2, pad = "0")
-    reactivo_nom <- paste0(prueba, "_", reactivo_nom)
-    paste0(ruta, reactivo_nom, ".png")
+  generar_plot(modelo, items, ruta, prueba, tipo)
+}
+
+generar_plot <- function(modelo, reactivos_id, ruta, prueba, tipo = "trace") {
+  map(reactivos_id, function(reactivo) {
     
-    png(filename = paste0(ruta, reactivo_nom, ".png"), 
-        width = 800, height = 600)
-    print(itemplot(modelo$modelo, reactivo, main = reactivo_nom))
+    reactivo_nom <- str_pad(reactivo, width = 2, pad = "0")
+    ruta_reactivo <- paste0(ruta, prueba, "_", reactivo_nom, ".png")
+    
+    png(filename = ruta_reactivo, width = 800, height = 600)
+    print(itemplot(modelo, reactivo, main = paste0(prueba, "_", reactivo_nom), type=tipo))
     dev.off()
   })
-})
+}
+
+
+map(psicometricos_2pl_mirt, get_plot, tipo = "trace")
+map(psicometricos_2pl_mirt, get_plot, tipo = "info")
+map(psicometricos_2pl_mirt, get_plot, tipo = "SE")
+
