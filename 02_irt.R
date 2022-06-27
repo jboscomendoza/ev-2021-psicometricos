@@ -43,7 +43,6 @@ get_psych <- function(tabla, n_grado, asignatura, parametros=1) {
       disc_baja = ifelse(pBis < 0.20, "Baja", ""),
       alpha_bajo = ifelse(alphaCronbach < alphaIfDeleted, "Baja", "")
     )
-  
 }
 
 
@@ -70,5 +69,5 @@ psicometricos_2pl <-
     get_psych(alumnos, grado, asignatura, parametros = 2)
   })
 
-write_feather(psicometricos_2pl , "psicometricos_2pl.feather")
-write_csv(psicometricos2_2pl, "psicometricos_2pl.csv")
+write_feather(psicometricos_2pl, "psicometricos_2pl.feather")
+write_csv(psicometricos_2pl, "psicometricos_2pl.csv")

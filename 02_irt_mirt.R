@@ -63,3 +63,34 @@ psicometricos_2pl_df <-
     rango_dificultad = ifelse(between(dificultad_beta, -3, 3), "", "Extremo"),
     rango_discriminacion = ifelse(discriminacion_alfa >= 0.5, "", "Baja")
   )
+
+
+# Exportar
+
+write_feather(psicometricos_2pl_df, "psicometricos_2pl.feather" )
+write_csv(psicometricos_2pl_df, "psicometricos_2pl.csv" )
+
+
+# Plots
+dir.create("plots_2pl/")
+
+map(psicometricos_2pl_mirt, function(modelo){
+  
+  prueba <- unique(modelo$parametros$prueba)
+  items  <- modelo$parametros$item
+  conteo <- 1:length(items)
+  
+  ruta <- paste0("plots_2pl/", prueba, "/")
+  if(!dir.exists(ruta)) dir.create(ruta)
+  
+  map(conteo, function(reactivo) {
+    reactivo_nom <- str_pad(reactivo, width = 2, pad = "0")
+    reactivo_nom <- paste0(prueba, "_", reactivo_nom)
+    paste0(ruta, reactivo_nom, ".png")
+    
+    png(filename = paste0(ruta, reactivo_nom, ".png"), 
+        width = 800, height = 600)
+    print(itemplot(modelo$modelo, reactivo, main = reactivo_nom))
+    dev.off()
+  })
+})

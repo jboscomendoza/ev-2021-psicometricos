@@ -1,4 +1,5 @@
 library(tidyverse)
+library(feather)
 
 psicom <- read_feather("psicometricos.feather")
 
@@ -35,8 +36,15 @@ psicom %>%
   ggplot() +
   aes(asignatura, Beta, color = grado) +
   geom_boxplot() +
-  geom_point(position = position_dodge(.75), alpha =.3) +
+  geom_point(position = position_dodge(.75), alpha =.4, size = 3) +
   theme_bw()
+
+psicom %>% 
+  rename("Beta" = "beta") %>% 
+  ggplot() +
+  aes(asignatura, Beta, color = grado) +
+  geom_density()
+
 
 
 create_boxplot <- function(tabla, eje_y) {
