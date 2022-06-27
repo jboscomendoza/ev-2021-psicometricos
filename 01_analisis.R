@@ -4,18 +4,6 @@ library(CTT)
 
 alumnos <- read_feather("alumnos.feather")
 
-out_ctt_lec <- 
-  split(alumnos, list(alumnos$grado, alumnos$fuente)) %>% 
-  map(select, matches("L\\d{2}")) %>%
-  map(function(x){
-    seleccion <- as.logical(colSums(x, na.rm = TRUE))
-    tabla <- x[seleccion]
-    tabla
-    if(ncol(tabla) > 1) {
-       itemAnalysis(as.data.frame(tabla))
-    }
-  })
-  
 
 get_ctt <- function(datos, asig) {
   patron <- paste0(asig, "\\d{2}")
@@ -55,7 +43,7 @@ ctt_consolidado <-
   mutate(asignatura = ifelse(grepl(itemName, pattern = "L"), 
                              "Lectura", "Matemáticas" ))
 
-write.csv(ctt_consolidado, file = "ctt_consolidad.csv", 
+
+write_feather(ctt_consolidado, "ctt_consolidado.feather")
+write.csv(ctt_consolidado, file = "ctt_consolidado.csv", 
           fileEncoding = "latin1", row.names = FALSE)
-
-

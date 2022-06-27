@@ -38,8 +38,11 @@ get_psych <- function(tabla, n_grado, asignatura) {
 }
 
 
-grid_pruebas <- expand_grid("grado" = as.character(2:9), "asignatura" = c("M", "L"))
+grid_pruebas <- expand_grid("grado" = as.character(2:9), 
+                            "asignatura" = c("M", "L"))
 
+
+alumnos <- read_feather("alumnos.feather")
 
 psicometricos <- 
   pmap_df(grid_pruebas, function(grado, asignatura) {
