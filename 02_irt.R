@@ -18,23 +18,32 @@ get_reactivos <- function(tabla, n_grado, asignatura) {
 }
 
 
-get_psych <- function(tabla, n_grado, asignatura) {
+get_psych <- function(tabla, n_grado, asignatura, parametros=1) {
   salida <- list()
   
   reactivos <- get_reactivos(tabla, n_grado, asignatura)
-    
+  
   if(NROW(reactivos) == 0) return(NULL)
-   
-   salida$irt <- tam.mml(reactivos, verbose = FALSE)
-   salida$ctt <- itemAnalysis(as.data.frame(reactivos))
-   
-   resultados <- 
-     bind_cols(salida$irt$item_irt, salida$ctt$itemReport) %>%
-     select(-"itemName") %>%
-     mutate(alphaCronbach = salida$ctt$alpha)
-   
-   tibble("asignatura" = asignatura, "grado" = n_grado) %>% 
-     bind_cols(., resultados)
+  
+  if(parametros == 1) {
+    salida$irt <- tam.mml(reactivos, verbose = FALSE)
+  } else {
+    salida$irt <- tam.mml.2pl(reactivos, verbose = FALSE)
+  }
+  salida$ctt <- itemAnalysis(as.data.frame(reactivos))
+  
+  resultados <- 
+    bind_cols(salida$irt$item_irt, salida$ctt$itemReport) %>%
+    select(-"itemName") %>%
+    mutate(alphaCronbach = salida$ctt$alpha)
+  
+  tibble("asignatura" = asignatura, "grado" = n_grado) %>% 
+    bind_cols(., resultados) %>% 
+    mutate(
+      disc_baja = ifelse(pBis < 0.20, "Baja", ""),
+      alpha_bajo = ifelse(alphaCronbach < alphaIfDeleted, "Baja", "")
+    )
+  
 }
 
 
@@ -44,19 +53,22 @@ grid_pruebas <- expand_grid("grado" = as.character(2:9),
 
 alumnos <- read_feather("alumnos.feather")
 
+# Un parametro
 psicometricos <- 
   pmap_df(grid_pruebas, function(grado, asignatura) {
     get_psych(alumnos, grado, asignatura)
   })
 
 
-psicometricos_salida <- 
-  psicometricos %>% 
-  mutate(
-    disc_baja = ifelse(pBis < 0.20, "Baja", ""),
-    alpha_bajo = ifelse(alphaCronbach < alphaIfDeleted, "Baja", "")
-  )
-  
+write_feather(psicometricos, "psicometricos.feather")
+write_csv(psicometricos, "psicometricos.csv")
 
-write_feather(psicometricos_salida , "psicometricos.feather")
-write_csv(psicometricos_salida , "psicometricos.csv")
+
+# Dos parametros
+psicometricos_2pl <- 
+  pmap_df(grid_pruebas, function(grado, asignatura) {
+    get_psych(alumnos, grado, asignatura, parametros = 2)
+  })
+
+write_feather(psicometricos_2pl , "psicometricos_2pl.feather")
+write_csv(psicometricos2_2pl, "psicometricos_2pl.csv")

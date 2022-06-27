@@ -44,3 +44,5 @@ vignettes/*.pdf
 *.feather
 *.csv
 *.zip
+*.pdf
+*.7zp
